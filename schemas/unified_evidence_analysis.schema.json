@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unified evidence analysis output",
+  "type": "object",
+  "required": [
+    "corroborated_evidence",
+    "stepaudior1_specific",
+    "qwen3_specific",
+    "disagreements",
+    "overall_agreement",
+    "recommended_answer",
+    "confidence",
+    "needs_tool_verification",
+    "verification_reasons",
+    "audio_content_types"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "corroborated_evidence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence_item"}
+    },
+    "stepaudior1_specific": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence_item"}
+    },
+    "qwen3_specific": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence_item"}
+    },
+    "disagreements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "topic",
+          "stepaudior1_claim",
+          "qwen3_claim",
+          "more_credible",
+          "reason"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "topic": {"type": "string"},
+          "stepaudior1_claim": {"type": "string"},
+          "qwen3_claim": {"type": "string"},
+          "more_credible": {
+            "type": "string",
+            "enum": ["stepaudior1", "qwen3", "neither"]
+          },
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "overall_agreement": {
+      "type": "string",
+      "enum": ["unanimous", "partial", "conflicting"]
+    },
+    "recommended_answer": {"type": "string"},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "needs_tool_verification": {"type": "boolean"},
+    "verification_reasons": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "audio_content_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["speech", "music", "sound_effects", "environmental", "silence"]
+      }
+    }
+  },
+  "$defs": {
+    "evidence_item": {
+      "type": "object",
+      "required": ["content", "confidence", "reliability"],
+      "additionalProperties": true,
+      "properties": {
+        "content": {"type": "string"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "reliability": {
+          "type": "string",
+          "enum": ["evidence_based", "speculative", "potentially_hallucinated"]
+        }
+      }
+    }
+  }
+}

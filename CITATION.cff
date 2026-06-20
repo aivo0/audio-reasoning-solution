@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use these artifact materials, please cite the paper and this repository."
+title: "Agent Track Winning Solution - MMAR Audio Reasoning Challenge (Interspeech 2026)"
+type: dataset
+authors:
+  - family-names: Olev
+    given-names: Aivo
+    affiliation: Tallinn University of Technology
+  - family-names: Alumäe
+    given-names: Tanel
+    affiliation: Tallinn University of Technology
+abstract: "Public artifact materials for TalTech's Agent Track winning solution in the Interspeech 2026 MMAR Audio Reasoning Challenge, including prompt templates, JSON output schemas, and generated reasoning outputs for public benchmark samples."
+keywords:
+  - audio reasoning
+  - MMAR
+  - Interspeech 2026 Audio Reasoning Challenge
+  - Agent Track
+  - prompt templates
+  - reasoning quality
+license: CC-BY-4.0
+repository-code: "https://github.com/aivo0/audio-reasoning-solution"
+preferred-citation:
+  type: conference-paper
+  title: "Multi-Source Evidence Fusion for Audio Question Answering"
+  authors:
+    - family-names: Olev
+      given-names: Aivo
+      affiliation: Tallinn University of Technology
+    - family-names: Alumäe
+      given-names: Tanel
+      affiliation: Tallinn University of Technology
+  conference: Interspeech 2026
+  year: 2026

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hypothesis result evaluation output",
+  "type": "object",
+  "required": ["result", "reasoning", "evidence_updates"],
+  "additionalProperties": true,
+  "properties": {
+    "result": {
+      "type": "string",
+      "enum": ["confirmed", "rejected", "inconclusive"]
+    },
+    "reasoning": {"type": "string"},
+    "evidence_updates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence_id", "new_status", "reason"],
+        "additionalProperties": true,
+        "properties": {
+          "evidence_id": {"type": "string"},
+          "new_status": {
+            "type": "string",
+            "enum": ["confirmed", "potentially_hallucinated"]
+          },
+          "reason": {"type": "string"}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Evidence synthesis output",
+  "type": "object",
+  "required": [
+    "scored_observations",
+    "synthesis_reasoning",
+    "confidence",
+    "audio_content_types"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "scored_observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "content",
+          "segment_source",
+          "start_time",
+          "end_time",
+          "relevance_score",
+          "relevance_reasoning"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "content": {"type": "string"},
+          "segment_source": {"type": "string"},
+          "start_time": {"type": "number", "minimum": 0},
+          "end_time": {"type": "number", "minimum": 0},
+          "relevance_score": {"type": "number", "minimum": 0, "maximum": 1},
+          "relevance_reasoning": {"type": "string"}
+        }
+      }
+    },
+    "synthesis_reasoning": {"type": "string"},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "audio_content_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["speech", "music", "sound_effects", "environmental", "silence"]
+      }
+    }
+  }
+}

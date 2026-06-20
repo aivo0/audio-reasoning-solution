@@ -1,0 +1,31 @@
+{
+  "title": "Agent Track Winning Solution - MMAR Audio Reasoning Challenge (Interspeech 2026)",
+  "upload_type": "dataset",
+  "description": "Public artifact materials for TalTech's Agent Track winning solution in the Interspeech 2026 MMAR Audio Reasoning Challenge, including prompt templates, JSON output schemas, and generated reasoning outputs for public benchmark samples. Raw audio files are not redistributed.",
+  "creators": [
+    {
+      "name": "Olev, Aivo",
+      "affiliation": "Tallinn University of Technology"
+    },
+    {
+      "name": "Alumäe, Tanel",
+      "affiliation": "Tallinn University of Technology"
+    }
+  ],
+  "license": "cc-by-4.0",
+  "keywords": [
+    "audio reasoning",
+    "MMAR",
+    "Interspeech 2026 Audio Reasoning Challenge",
+    "Agent Track",
+    "prompt templates",
+    "reasoning quality"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/aivo0/audio-reasoning-solution",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

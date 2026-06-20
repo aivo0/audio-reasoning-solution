@@ -1,20 +1,34 @@
-# Winning Solution — MMAR Audio Reasoning Challenge (Interspeech 2026)
+# Agent Track Winning Solution - MMAR Audio Reasoning Challenge (Interspeech 2026)
 
-This repository contains the winning solution for the **MMAR Audio Reasoning Challenge**, held as part of Interspeech 2026.
+This repository contains the public artifact materials for TalTech's Agent Track winning solution in the **MMAR Audio Reasoning Challenge**, held as part of Interspeech 2026.
+
+It accompanies the camera-ready paper, "Multi-Source Evidence Fusion for Audio Question Answering", and provides the materials promised there: example reasoning outputs, prompt templates, and structured output schemas.
+
+## Contents
+
+- [`prompts/`](prompts) contains the final prompt templates, with development-version labels removed.
+- [`schemas/`](schemas) contains JSON Schemas for structured outputs expected from prompt-driven stages.
+- [`samples/`](samples) contains detailed reasoning chains for all 1,000 public MMAR benchmark samples.
 
 ## Prompts and Schemas
 
-The camera-ready paper is a regular Interspeech paper, so detailed prompt text and output schemas are provided here instead of as an in-paper appendix.
+The camera-ready paper refers readers here for detailed prompt text and output schemas.
 
-- [`prompts/v10`](prompts/v10) contains the v10 prompts used by the evidence-only tool loop, including reliability evaluation, contradiction detection, hypothesis-result evaluation, and answer selection.
-- [`prompts/v11`](prompts/v11) contains the v11 prompts used for the final observation/evidence synthesis and reasoning generation stages.
-- [`prompts/contradiction_detection_schema.json`](prompts/contradiction_detection_schema.json) records the structured output expected from the contradiction-detection prompt.
+The prompt files are named by pipeline stage rather than by internal development version. They cover source observation queries, evidence synthesis, reliability evaluation, contradiction detection, targeted hypothesis evaluation, answer selection, reasoning generation, and reasoning compaction.
+
+The schema files describe the JSON outputs used by structured stages such as evidence synthesis, contradiction detection, reliability evaluation, and hypothesis-result evaluation.
 
 ## About the Challenge
 
 The MMAR (Multimodal Music, Audio, and Reasoning) benchmark comprises **1,000 samples** spanning speech, sound, music, and mixed-modality audio. Each sample includes an audio clip, a question, a correct answer, and annotated reasoning rationales.
 
 Submissions are evaluated on both **answer correctness** and **reasoning quality**. When the predicted answer is correct, an LLM evaluator scores the reasoning chain on a scale of 0.2 to 1.0. Each submission undergoes five independent evaluation runs, with the final score being the mean of the three middle runs.
+
+The benchmark metadata are public. This repository does not redistribute raw audio files; it publishes prompt materials, output schemas, and generated reasoning outputs for the public benchmark samples.
+
+## Citation and License
+
+Please cite the paper and this artifact if you use these materials. Citation metadata is provided in [`CITATION.cff`](CITATION.cff). The repository's own prompt text, schemas, documentation, and generated reasoning outputs are licensed under CC BY 4.0; third-party benchmark content remains subject to the original MMAR dataset terms.
 
 ## Reasoning Samples
 
