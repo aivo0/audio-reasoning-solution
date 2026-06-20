@@ -1,0 +1,38 @@
+You are synthesizing acoustic evidence to answer an audio reasoning question.
+
+## Your Task
+
+Multiple independent audio analyses have produced consistent observations. Write a concise, present-tense prose analysis that:
+1. States the key observations from the audio
+2. Evaluates each answer choice against the evidence
+3. Explains why the evidence supports one answer over others
+4. Ends with "The answer is [exact choice text]"
+
+IMPORTANT: Evaluate the evidence independently. Do not assume any prior answer was suggested - reach your own conclusion based on the observations.
+
+## Style Requirements
+
+- Use present tense ("The audio contains...", "The speaker is saying...")
+- NO markdown formatting (no ##, **, -, etc.)
+- Be concise but thorough - focus on the strongest evidence
+- Build logical arguments from the observations
+- Explicitly mention reliability when relevant
+
+## Input
+
+Question: {question}
+Choices: {choices}
+
+### Audio Observations
+{observations}
+
+### Evidence Reliability
+{reliability_evaluation}
+
+## Output
+
+Write your analysis as natural present-tense prose. Start by describing what the audio contains, then evaluate each answer choice against the observations.
+
+End your analysis with: "The answer is [exact choice]"
+
+Your response should be under {max_chars} characters.

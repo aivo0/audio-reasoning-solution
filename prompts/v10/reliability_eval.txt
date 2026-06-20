@@ -1,0 +1,89 @@
+You are evaluating the reliability of observations from speech LLM models that analyzed an audio file.
+
+## Critical Context
+
+The speech LLMs only had access to:
+1. The raw audio WAV file
+2. The question text
+3. The answer choices
+
+They did NOT have access to: video, images, metadata, external knowledge, or any other information.
+
+## Reliability Categories (STRICT CRITERIA)
+
+**evidence_based** (high reliability) - ONLY for what can be DIRECTLY perceived without inference:
+- Sounds explicitly audible (speech content, music, sound effects, ambient noise)
+- Speaker characteristics directly audible in voice (gender, accent, approximate age, emotion FROM TONE)
+- Acoustic properties that are directly measurable (tempo, pitch, volume, presence of reverb)
+- Content explicitly mentioned in the question or answer choices
+- Counting of clearly distinct, countable events
+
+IMPORTANT: The observation must describe WHAT IS HEARD, not what it IMPLIES.
+- Describing an acoustic property = evidence_based
+- Inferring physical space from that property = speculative
+- Describing voice quality = evidence_based
+- Inferring emotional state from voice = speculative
+
+**speculative** (medium reliability) - Reasonable inference from audio BUT requires interpretation:
+- ANY inference about physical environment from acoustic cues
+- Emotional states inferred from voice characteristics
+- Scene context beyond what's explicitly audible (setting, situation, context)
+- Speaker intent, motivation, or relationships
+- Cause-effect relationships not explicitly stated
+- Quality judgments requiring subjective assessment
+- Comparisons requiring interpretation
+- Timing estimates that require approximation
+
+RULE: If the observation says "X suggests Y" or "X indicates Y", mark it as speculative.
+The directly perceivable X might be evidence_based, but the conclusion Y is speculative.
+
+**potentially_hallucinated** (low reliability) - Information the LLM could NOT have from audio:
+- Specific names not spoken in audio and not in question/choices
+- Exact timestamps with sub-second precision
+- External knowledge not present in audio
+- Visual information (colors, appearances, written text, gestures)
+- Visual references (seeing, watching, video, frame, appears visually) - audio models have NO visual input
+- Information about recording equipment, technical setup, or production details
+- Claims about what happened before or after the audio clip
+- Precise counts of ambiguous or overlapping events
+
+## Classification Principles
+
+1. Observations containing BOTH directly perceivable AND inferred elements should be marked based on the INFERRED portion (usually speculative)
+
+2. When an observation describes an acoustic property AND draws a conclusion from it, the conclusion determines the rating
+
+3. Subjective quality assessments are always speculative since they require interpretation
+
+## Your Task
+
+For each observation provided, determine its reliability level using the STRICT criteria above.
+
+## Input
+
+Question: {question}
+Choices: {choices}
+
+Observations to evaluate:
+{observations}
+
+## Output Format
+
+Return ONLY valid JSON (no markdown, no extra text):
+
+{{
+  "evaluated": [
+    {{
+      "observation": "original observation text",
+      "source": "which LLM (stepaudior1/qwen3/flamingo_caption)",
+      "reliability": "evidence_based|speculative|potentially_hallucinated",
+      "grounding": "brief explanation citing which part is directly perceivable vs inferred"
+    }}
+  ]
+}}
+
+CRITICAL RULES:
+1. If an observation contains BOTH evidence-based and speculative elements, mark it as speculative
+2. If an observation contains ANY potentially hallucinated element, mark it as potentially_hallucinated
+3. When in doubt between evidence_based and speculative, choose speculative
+4. Describe in grounding what is directly perceivable vs what requires inference

@@ -1,0 +1,154 @@
+You are synthesizing audio observations from multiple segments into scored evidence for an audio reasoning question.
+
+## Question
+{question}
+
+## Answer Choices
+{choices}
+
+## Audio Duration
+{audio_duration} seconds total
+
+## Evidence from Multiple Segments
+{evidence_sections}
+
+## Listening Model
+The audio was analyzed by up to 4 independent listeners:
+- **Full audio listener**: Heard the entire recording from start to finish
+- **Three focused listeners**: Each heard a non-overlapping third of the audio (focused listening on their time window)
+
+The focused listeners do NOT overlap. Each focused on its portion and may detect details the full audio listener missed. The full audio listener provides holistic context.
+
+**IMPORTANT**: The segmented listening is an internal implementation detail. Your output must NEVER reference "Segment 1", "Segment 2", "Segment 3", or any segment numbering. Instead, use absolute timestamps (e.g., "around 5.0s", "between 7.0s and 14.0s") to locate events. The downstream consumer has no concept of segments.
+
+## Your Synthesis Tasks
+
+### 1. Timing Correction
+Convert relative timing references to ABSOLUTE times based on each listener's time window:
+- "at the start" from a listener covering 0.0s-X.0s -> specific time near 0.0s
+- "in the middle" from a listener covering X.0s-Y.0s -> specific time around (X+Y)/2
+- "at the end" from a listener covering Y.0s-Z.0s -> specific time near Z.0s
+- Keep full audio timing references as-is (they're already absolute)
+
+### 2. Cross-Listener Corroboration & Conflict Resolution
+For each distinct claim, check whether it appears in the full audio analysis, focused listener analyses, or both.
+
+- **Corroborated (focused listener + full audio agree):** Emit ONE merged observation. Add ~0.10 relevance_score bonus. In relevance_reasoning, note "Corroborated by multiple listeners". The full-audio listener independently corroborates what the focused listener detected.
+
+- **Focused-listener-only (focused listener detects something full audio missed):** Keep the observation at baseline confidence. In relevance_reasoning, note "Detected by focused listener only". The focused listener concentrated on a narrow time window; the full-audio listener may have missed it while processing the whole recording.
+
+- **Full-audio-only (full audio detects something no focused listener mentions):** Keep at baseline confidence. In relevance_reasoning, note "Detected in full audio only".
+
+- **Timing conflicts (full audio and focused listener disagree on timing):** Use the focused listener's timing. The focused listener was concentrated on a narrow window and provides more precise temporal information. In relevance_reasoning, note "Timing from focused listener (narrow window)".
+
+- **Conflicting descriptions:** When full audio and a focused listener genuinely disagree on what is heard (not just timing), note both perspectives in relevance_reasoning and keep the observation with slightly lower confidence. Different listeners hear different non-overlapping portions, so disagreement may reflect genuine variation across the audio.
+
+- **Multiple focused-listener confirmations:** If 2+ focused listeners report the same event (rare — only if an event spans a listener boundary), add ~0.05 bonus and note "Confirmed by multiple focused listeners".
+
+- DO NOT preserve both sides of a resolved conflict as separate observations.
+
+### 3. Relevance Scoring
+Score each observation's relevance to the SPECIFIC QUESTION (not general importance):
+
+| Score | Meaning | Example |
+|-------|---------|---------|
+| 0.9-1.0 | Directly answers or strongly supports/refutes an answer | Q: "What emotion?" -> "Speaker says 'I'm so happy'" |
+| 0.7-0.89 | Important context for evaluating answers | Q: "What emotion?" -> "Voice has higher pitch and faster pace" |
+| 0.5-0.69 | Indirectly relevant, may help distinguish choices | Q: "What emotion?" -> "Speaker is talking to a friend" |
+| 0.3-0.49 | Marginally relevant background | Q: "What emotion?" -> "Recording quality is clear" |
+| 0.0-0.29 | Not relevant to the question | Q: "What emotion?" -> "Background has traffic noise" |
+
+Scoring adjustments for corroboration:
+- Corroborated by focused listener + full audio: +0.10 bonus (cap at 1.0)
+- Corroborated by 2+ focused listeners (rare, spans listener boundary): +0.05 bonus
+- Single source only: no adjustment
+
+### 4. Hedging Separation
+When Qwen says "X (but could be Y)", this is TWO observations:
+1. Primary: "X" - score based on acoustic evidence strength
+2. Caveat: "Could alternatively be Y" - score 0.2-0.4 (low relevance caveat)
+
+Do NOT embed caveats inside primary observations. The downstream agent needs clear signals, not hedged claims.
+
+Example:
+  Input: "Speaker 2 has lower volume, possibly indicating greater distance,
+          but could stem from microphone placement"
+  Output observation 1: "Speaker 2 has lower perceived volume than Speaker 1"
+    relevance_score: 0.80, relevance_reasoning: "Direct acoustic measurement relevant to distance question"
+  Output observation 2: "Volume difference could be due to microphone placement rather than distance"
+    relevance_score: 0.30, relevance_reasoning: "Alternative explanation caveat - not based on specific acoustic evidence"
+
+### 5. Observation Merging
+- Merge REDUNDANT observations from different listeners into one
+- When merging focused listener + full audio observations of the same event, use the focused listener's timing and the full audio's broader context description
+- Keep segment_source as "full" for merged observations
+- Note corroboration in relevance_reasoning
+
+### 6. Audio Content Classification
+Based on what was heard across ALL listeners, classify the PRIMARY content types present.
+Select ALL that apply from:
+- "speech": Human dialogue, conversation, narration, or spoken words
+- "music": Instrumental or vocal music, songs, melodies
+- "sound_effects": Artificial sounds, notifications, impacts, mechanical sounds
+- "environmental": Natural ambient sounds, weather, animals, room acoustics
+- "silence": Extended periods of quiet or minimal audio
+
+Include at least one type. This classification determines which downstream analysis tools are used.
+
+## Output Format
+
+Return ONLY valid JSON (no markdown code blocks, no extra text):
+
+{{
+  "scored_observations": [
+    {{
+      "content": "The observation text with absolute timing if applicable",
+      "segment_source": "full",
+      "start_time": 0.0,
+      "end_time": {audio_duration},
+      "relevance_score": 0.85,
+      "relevance_reasoning": "Brief explanation of why this score. Corroborated by multiple listeners"
+    }},
+    {{
+      "content": "A speaker says 'hello' around 5 seconds into the audio",
+      "segment_source": "full",
+      "start_time": 4.5,
+      "end_time": 6.0,
+      "relevance_score": 0.75,
+      "relevance_reasoning": "Direct speech content relevant to understanding the conversation. Detected by focused listener only"
+    }}
+  ],
+  "synthesis_reasoning": "Overall assessment of evidence quality and completeness. Note any conflicts resolved and corroboration patterns.",
+  "confidence": 0.75,
+  "audio_content_types": ["speech", "music"]
+}}
+
+## Critical Rules
+
+1. **OUTPUT ONLY JSON** - No explanatory text before or after the JSON
+2. **NO RECOMMENDED ANSWER** - You are scoring observations, not answering the question
+3. **RELEVANCE TO QUESTION** - Score based on the specific question, not general importance
+4. **PRESERVE DETAIL** - Don't over-summarize; specific details are valuable
+5. **CONFIDENCE** reflects evidence completeness:
+   - 0.8+ : Clear, consistent observations covering the question
+   - 0.5-0.8: Some relevant observations but gaps or minor conflicts
+   - <0.5: Sparse, conflicting, or low-quality observations
+6. **RESOLVE, DON'T JUST FLAG** - When observations conflict, resolve using corroboration rules. Do NOT preserve both sides as separate observations.
+7. **STRIP HEDGING** - Separate core claims from caveats into distinct observations.
+8. **CORROBORATION = CONFIDENCE** - Multiple listener agreement is the strongest signal. More corroboration = higher relevance_score.
+9. **TRUST FOCUSED TIMING** - When full audio and focused listener disagree on when something occurs, use the focused listener's timing. Focused listeners have a narrow listening window.
+10. **COHERENT OUTPUT** - Produce a single unified evidence list as if from one careful listening session. The downstream consumer has NO concept of segments or multiple listeners. NEVER write "Segment 1", "Segment 2", "Segment 3" or similar references in the content or relevance_reasoning fields. Use absolute timestamps instead.
+
+## Relevance Scoring Examples
+
+For the question "What is the speaker's emotional state?":
+- "Speaker says 'I am devastated'" -> 0.95 (directly states emotion)
+- "Voice trembles and speaking pace is slow" -> 0.85 (strong emotional indicators)
+- "Speaker is talking about a recent event" -> 0.5 (context but not emotion)
+- "Recording has slight background hum" -> 0.2 (not relevant to emotion)
+
+For the question "How many people are speaking?":
+- "Two distinct voices alternate throughout" -> 0.95 (directly answers)
+- "Male voice speaks first, then female responds" -> 0.85 (implies count)
+- "Conversation appears to be informal" -> 0.4 (implies multiple but vague)
+- "Audio is recorded in a room" -> 0.1 (not relevant to speaker count)

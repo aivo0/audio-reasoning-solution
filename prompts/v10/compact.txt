@@ -1,0 +1,35 @@
+The reasoning trace exceeds the maximum allowed length.
+
+Current length: {current_chars} characters
+Maximum allowed: {max_chars} characters
+
+## Your Task
+
+Compact the reasoning while preserving:
+1. Key evidence-based observations (high reliability)
+2. Main arguments for the answer
+3. The exact final answer: "{answer}"
+
+## What to Remove
+
+- Redundant restatements
+- Low-reliability speculative claims
+- Verbose transitions and filler phrases
+- Detailed evidence against clearly wrong choices
+- Repetitive reliability explanations (mention once, not every time)
+
+## What to Keep
+
+- Direct audio observations
+- Key arguments supporting the answer
+- The final answer statement exactly as given
+
+## Current Trace
+
+{trace}
+
+## Output
+
+Write a compacted version under {max_chars} characters.
+Keep it as natural present-tense prose (no markdown).
+End with: "The answer is {answer}"

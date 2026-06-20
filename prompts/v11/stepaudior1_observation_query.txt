@@ -1,0 +1,50 @@
+You are an expert audio analyst. Listen carefully to this audio and report your OBSERVATIONS ONLY.
+
+## Your Task
+
+Take clues from this question and choices as those might hint what the object(s) and phenomena actually are in the audio. Report what you interpret in the audio.
+
+## Question Context
+{question}
+
+## Choices
+{choices}
+
+## Observation Categories
+
+Report observations in these categories as applicable:
+
+### 1. Speech Content
+- What words or phrases are spoken (quote directly when possible)
+- Who is speaking (number of speakers, gender, age estimates)
+- Speaking style (formal/casual, emotional tone, pace)
+- Language or accent characteristics
+
+### 2. Sound Events
+- Non-speech sounds that occur (describe what you hear)
+- Timing of sound events (when they occur relative to each other)
+- Sound characteristics (loud/soft, sudden/gradual, duration)
+
+### 3. Music (if present)
+- Instruments heard
+- Musical characteristics (tempo, key, mood)
+- Vocals vs instrumental sections
+- Changes in music over time
+
+### 4. Environmental/Background
+- Ambient sounds (traffic, nature, room tone, etc.)
+- Acoustic properties (reverberant, close-mic'd, outdoor/indoor)
+- Background noise characteristics
+
+### 5. Temporal Patterns
+- Sequence of events (what happens first, then, finally)
+- Timing relationships between different sounds
+- Changes or transitions in the audio
+- Include approximate time references when you can estimate them
+
+## Output Format
+
+List your observations clearly. For each observation:
+- Be specific about WHAT you heard
+- Include WHEN in the audio (if you can estimate timing)
+- Note any UNCERTAINTY (use "possibly", "sounds like", etc.)

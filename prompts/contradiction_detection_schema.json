@@ -1,0 +1,110 @@
+{
+  "type": "object",
+  "required": [
+    "thinking",
+    "evidence_relevance",
+    "contradiction_validity",
+    "contradictions",
+    "evidence_status_updates",
+    "hypotheses_to_test"
+  ],
+  "properties": {
+    "thinking": {
+      "type": "string",
+      "description": "Reasoning about the evidence, including any intra-tool contradictions."
+    },
+    "evidence_relevance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence_id", "relevance_score", "relevance_reasoning", "addresses_question"],
+        "properties": {
+          "evidence_id": {"type": "string"},
+          "relevance_score": {"type": "number", "minimum": 0, "maximum": 1},
+          "relevance_reasoning": {"type": "string"},
+          "addresses_question": {"type": "boolean"}
+        }
+      }
+    },
+    "contradiction_validity": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["contradiction_id", "is_valid", "reason"],
+        "properties": {
+          "contradiction_id": {"type": "integer"},
+          "is_valid": {"type": "boolean"},
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "contradictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "evidence_ids", "type", "severity"],
+        "properties": {
+          "description": {"type": "string"},
+          "evidence_ids": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "type": {
+            "type": "string",
+            "enum": ["inter_tool", "intra_tool", "reliability_violation"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          }
+        }
+      }
+    },
+    "evidence_status_updates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence_id", "new_status", "reason"],
+        "properties": {
+          "evidence_id": {"type": "string"},
+          "new_status": {
+            "type": "string",
+            "enum": ["confirmed", "potentially_hallucinated"]
+          },
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "hypotheses_to_test": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["hypothesis_id", "claim", "supporting_evidence_ids", "contradicting_evidence_ids", "tool_calls"],
+        "properties": {
+          "hypothesis_id": {"type": "string"},
+          "claim": {"type": "string"},
+          "supporting_evidence_ids": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "contradicting_evidence_ids": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "tool_calls": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["tool", "start_time", "end_time"],
+              "properties": {
+                "tool": {"type": "string"},
+                "start_time": {"type": "number"},
+                "end_time": {"type": "number"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

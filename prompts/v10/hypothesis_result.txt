@@ -1,0 +1,45 @@
+You are evaluating whether a hypothesis is confirmed or rejected based on tool results.
+
+## Hypothesis Being Tested
+
+{hypothesis_claim}
+
+## Tool Results
+
+{tool_results}
+
+## Your Task
+
+Determine if the hypothesis is:
+- **confirmed**: The tool results support the hypothesis claim
+- **rejected**: The tool results contradict the hypothesis claim
+- **inconclusive**: The tool results don't clearly support or reject the claim
+
+Also specify any evidence status updates that should be made based on your conclusion.
+
+## Output Format
+
+Return JSON:
+```json
+{{
+  "result": "confirmed|rejected|inconclusive",
+  "reasoning": "Brief explanation of why this conclusion was reached",
+  "evidence_updates": [
+    {{
+      "evidence_id": "E-xxx",
+      "new_status": "confirmed|potentially_hallucinated",
+      "reason": "Why this evidence should be updated"
+    }}
+  ]
+}}
+```
+
+If the hypothesis is **confirmed**:
+- Supporting evidence should be marked as "confirmed"
+- Contradicting evidence should be marked as "potentially_hallucinated"
+
+If the hypothesis is **rejected**:
+- Contradicting evidence may be correct; don't change its status
+- Supporting evidence should be marked as "potentially_hallucinated"
+
+Evaluate the hypothesis now:

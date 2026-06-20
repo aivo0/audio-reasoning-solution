@@ -2,6 +2,14 @@
 
 This repository contains the winning solution for the **MMAR Audio Reasoning Challenge**, held as part of Interspeech 2026.
 
+## Prompts and Schemas
+
+The camera-ready paper is a regular Interspeech paper, so detailed prompt text and output schemas are provided here instead of as an in-paper appendix.
+
+- [`prompts/v10`](prompts/v10) contains the v10 prompts used by the evidence-only tool loop, including reliability evaluation, contradiction detection, hypothesis-result evaluation, and answer selection.
+- [`prompts/v11`](prompts/v11) contains the v11 prompts used for the final observation/evidence synthesis and reasoning generation stages.
+- [`prompts/contradiction_detection_schema.json`](prompts/contradiction_detection_schema.json) records the structured output expected from the contradiction-detection prompt.
+
 ## About the Challenge
 
 The MMAR (Multimodal Music, Audio, and Reasoning) benchmark comprises **1,000 samples** spanning speech, sound, music, and mixed-modality audio. Each sample includes an audio clip, a question, a correct answer, and annotated reasoning rationales.

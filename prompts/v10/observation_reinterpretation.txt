@@ -1,0 +1,61 @@
+You are re-evaluating audio observations WITHOUT knowing what the original sources concluded.
+
+## Raw Observations (from multiple speech-to-reasoning models)
+
+{observations_only}
+
+## Question
+{question}
+
+## Choices
+{choices}
+
+## Your Task
+
+Based ONLY on the raw observations above (NOT any predictions or hypotheses):
+
+1. **List Key Acoustic Evidence**: What specific sounds/features were observed?
+
+2. **For Each Choice**: How well do the observations support or contradict it?
+   - Consider MULTIPLE interpretations of the same sounds
+
+3. **Independent Prediction**: Which choice is best supported by the observations?
+   - Provide confidence (0.0-1.0)
+   - Note if multiple choices are plausible
+
+## Output Format (JSON)
+
+Return ONLY valid JSON (no markdown, no extra text):
+
+{{
+  "key_observations": ["observation 1", "observation 2"],
+  "choice_analysis": {{
+    "Choice A": {{"support": "evidence for", "contradict": "evidence against", "plausibility": 0.7}},
+    "Choice B": {{"support": "...", "contradict": "...", "plausibility": 0.3}}
+  }},
+  "predicted_answer": "most supported choice",
+  "confidence": 0.75,
+  "alternative_interpretation": "note if observations could support different answer",
+  "reasoning": "brief explanation of why observations support this answer over alternatives"
+}}
+
+## Critical Rules
+
+1. **Ignore source predictions**: You are given only raw observations, not conclusions. Evaluate the observations independently.
+
+2. **Consider alternative interpretations**: The same sound can have multiple meanings:
+   - A sound disappearing could mean: the source stopped, moved away, or was transformed
+   - A change in texture/quality could have multiple physical causes
+   - Sequential sounds may or may not have a causal relationship
+
+3. **Trust acoustic observations over interpretations**:
+   - "I hear a specific sound" = reliable observation
+   - "The cause of the sound is X" = interpretation (may be wrong)
+
+4. **Plausibility must sum to reasonable total**: If two choices have plausibility 0.7 and 0.6, you're uncertain. If one has 0.9 and others <0.2, you're confident.
+
+5. **predicted_answer MUST be one of the exact choices provided**.
+
+6. **CRITICAL - Transformation direction ambiguity**: When comparing two states (before/after), consider BOTH directions:
+
+   NEVER assume only one interpretation. Explicitly analyze BOTH directions before concluding.

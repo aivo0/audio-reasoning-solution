@@ -1,0 +1,162 @@
+You are analyzing gathered evidence for contradictions and proposing hypotheses to test.
+
+## Context
+
+Question: {question}
+Choices: {choices}
+
+## Evidence with Reliability Labels
+
+Each evidence item is labeled with:
+- Tool reliability: reproducible (consistent output), probabilistic, heuristic, speech_llm
+- Confirmation status: confirmed, unconfirmed, potentially_hallucinated, hallucinated
+
+Evidence:
+{evidence}
+
+## Your Task
+
+Analyze the evidence for THREE types of contradictions AND assess each piece of evidence for relevance to the question:
+
+## Evidence Relevance Assessment (CRITICAL)
+
+For EACH evidence item, assess:
+1. Does this evidence DIRECTLY address the question being asked?
+2. Could this measurement be identical regardless of the correct answer?
+3. What specific aspect of the question does this evidence address (or fail to address)?
+
+Mark evidence as LOW RELEVANCE (score < 0.5) if:
+- It measures a property not related to the question
+- It could be the same whether the answer is A or B
+- It addresses a different aspect of the audio than what's being asked
+
+### 1. Inter-tool Contradictions (between different evidence sources)
+Look for evidence items that make conflicting claims about the same thing:
+- Different counts of the same phenomenon
+- Different identifications of the same sound source
+- Conflicting environment classifications
+
+### 2. Intra-tool Contradictions (within a single evidence item)
+Check if a tool's CONCLUSION contradicts its own listed EVIDENCE:
+- A classification that conflicts with the supporting measurements
+- A summary that contradicts the detailed findings
+- A confidence level inconsistent with the reported uncertainty
+
+When you find intra-tool contradictions, mark that evidence as potentially_hallucinated.
+
+### 3. Reliability Hierarchy Violations
+When evidence conflicts, higher reliability sources should be trusted:
+- REPRODUCIBLE tools (beat detection, energy analysis) give consistent measurements but require relevance assessment
+- PROBABILISTIC tools (ASR, diarization) are usually reliable but can err
+- HEURISTIC tools (classification, environment detection) provide useful but uncertain signals
+- SPEECH_LLM claims are speculative and need corroboration — but should NOT be dismissed outright. When uncorroborated, propose segment-specific verification in hypotheses_to_test rather than marking as hallucinated.
+
+IMPORTANT: When two HEURISTIC tools contradict each other, BOTH should be marked as potentially_hallucinated since neither has higher authority.
+
+IMPORTANT: Contradictions from reproducible tools should be MARKED but not used to DISMISS.
+- Reproducible tools may analyze different segments or have timing offsets
+- Mark the contradiction as "evident" but keep both pieces of evidence
+- Let the argumentation agent weigh the contradiction in final reasoning
+- Example: If energy dynamics shows "no sudden changes" but speech LLM reports something loud at 3s":
+  - Mark as contradiction type="reliability_violation", severity="medium"
+  - Do NOT mark speech LLM claim as "hallucinated" - the timing could differ
+  - The final argumentation will consider both perspectives
+
+### 4. Logical Reasoning Awareness
+
+When analyzing evidence, be aware of these reasoning pitfalls:
+
+**Absence Claims**: Evidence stating "X not detected" has lower reliability than evidence stating "X detected".
+A tool failing to detect something does NOT confirm its absence - tools have detection thresholds and limitations.
+
+**Single-Source Speculative Claims**: SPEECH_LLM evidence with specific scenario descriptions (settings, contexts,
+intentions) should be marked as speculative and flagged for segment-specific verification, not dismissed as potentially_hallucinated. Only mark as potentially_hallucinated if actively contradicted by reproducible tool evidence analyzing the same segment.
+
+**Diarization Speaker Counts**: If diarization reports a speaker count but multiple independent observations
+describe interactions between more participants, the diarization count may be unreliable.
+
+**Transcription Disagreements**: When different tools/sources report different transcriptions for the same segment:
+- Flag as contradiction ONLY if the segment timings significantly overlap (within 1-2 seconds)
+- Note the EXACT words that differ, especially negation words ("don't" vs "do", "not" vs "")
+- Mark severity as "high" when a single word changes the meaning completely
+- If timings don't overlap, the different transcriptions may be for different segments - not a contradiction
+
+## Evidence Status Updates
+
+Based on your analysis, update evidence status:
+- Mark low-reliability evidence as potentially_hallucinated if contradicted by higher reliability evidence
+- Mark evidence as confirmed if corroborated by multiple independent sources
+- Mark evidence with internal contradictions as potentially_hallucinated
+
+## Hypotheses to Test
+
+Propose hypotheses to resolve important ambiguities:
+- Each hypothesis should have specific tool calls with timestamps
+- Focus on claims consequential for answering the question
+- IMPORTANT: Include both supporting_evidence_ids AND contradicting_evidence_ids to build the evidence graph
+
+## Output Format
+
+Return JSON:
+```json
+{{
+  "thinking": "Your reasoning about the evidence, including any intra-tool contradictions you found",
+  "evidence_relevance": [
+    {{
+      "evidence_id": "E-xxx",
+      "relevance_score": 0.8,
+      "relevance_reasoning": "Why this evidence is/isn't relevant to the specific question",
+      "addresses_question": true
+    }}
+  ],
+  "contradiction_validity": [
+    {{
+      "contradiction_id": 1,
+      "is_valid": false,
+      "reason": "Is this a real contradiction, or is one piece of evidence simply irrelevant to the question?"
+    }}
+  ],
+  "contradictions": [
+    {{
+      "description": "Brief description of the contradiction",
+      "evidence_ids": ["E-xxx", "E-yyy"],
+      "type": "inter_tool|intra_tool|reliability_violation",
+      "severity": "high|medium|low"
+    }}
+  ],
+  "evidence_status_updates": [
+    {{
+      "evidence_id": "E-xxx",
+      "new_status": "confirmed|potentially_hallucinated",
+      "reason": "Why this status change is warranted (cite specific contradicting evidence)"
+    }}
+  ],
+  "hypotheses_to_test": [
+    {{
+      "hypothesis_id": "H-1",
+      "claim": "The claim being tested",
+      "supporting_evidence_ids": ["E-xxx"],
+      "contradicting_evidence_ids": ["E-yyy"],
+      "tool_calls": [
+        {{
+          "tool": "tool_name",
+          "start_time": 5.0,
+          "end_time": 10.0
+        }}
+      ]
+    }}
+  ]
+}}
+```
+
+CRITICAL: Always populate:
+1. evidence_relevance for EVERY evidence item - this determines how much weight it gets in final reasoning
+2. contradiction_validity for EACH contradiction - a reproducible measurement that doesn't address the question should NOT invalidate speech content observations that do
+3. supporting_evidence_ids and contradicting_evidence_ids for each hypothesis - this builds the evidence graph
+
+When evaluating contradictions, consider:
+- Is this a real contradiction, or is one piece of evidence simply irrelevant to the question?
+- A reproducible measurement that doesn't address the question should NOT invalidate relevant observations
+- Example: Energy dynamics showing "no sudden events" does NOT contradict speech content detecting emergency words - the energy tool measures loudness, not semantic content
+
+Analyze the evidence now:

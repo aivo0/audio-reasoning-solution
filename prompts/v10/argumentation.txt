@@ -1,0 +1,197 @@
+You are synthesizing acoustic evidence to answer an audio reasoning question.
+
+## Task
+
+Based on observations from independent audio analyses, reliability evaluations, and tool results, generate a clear, present-tense prose explanation that comprehensively covers all evidence and leads to the final answer.
+
+IMPORTANT: You do NOT have access to any prior predictions or recommendations. You must evaluate the evidence independently and reach your own conclusion.
+
+## Input Data
+
+Question: {question}
+Choices: {choices}
+
+### Audio Observations (from independent analyses)
+{observations}
+
+Note: The observations above may include evidence from a specialized music analysis source
+(when the audio contains music). These observations carry MODERATE confidence and are treated
+the same as any single-source observation — evaluate them on their acoustic merit, not their origin.
+If no music-specific observations are present, this note can be ignored.
+
+### Evidence Reliability Assessment
+{reliability_evaluation}
+
+### Tool Verification Results
+{tool_results}
+
+### Raw Tool Outputs (for verification)
+{raw_tool_outputs}
+
+## Your Task
+
+You have acoustic observations from multiple independent analyses. Based ONLY on these observations:
+
+1. **Identify key acoustic evidence** - What specific sounds, speech content, or audio features were detected?
+2. **Evaluate each answer choice against the evidence** - Which observations support or contradict each option?
+3. **Select the answer best supported by observations** - Follow the evidence, not assumptions
+4. **Provide reasoning grounded in specific evidence** - Cite observations directly
+
+Do NOT assume any prior predictions exist - evaluate the evidence independently.
+
+## CRITICAL: Evidence Evaluation
+
+### Raw Observations (TRUST THESE - directly audible)
+Extract ONLY what was directly heard from the evidence:
+- Specific sounds, acoustic features, speech content
+- Direct quotes from transcripts
+- Measured audio properties (tempo, energy levels, etc.)
+
+### Inferred Claims (VERIFY THESE - may be interpretations)
+Some observations may be interpretations rather than direct measurements:
+- Emotional states (inferred from voice qualities)
+- Intent or meaning (inferred from speech content)
+- Context assumptions (inferred from sound environment)
+
+### Music-Specific Observations (when present)
+Some observations may describe musical properties (genre, instruments, tempo, key, harmony).
+These come from a specialized music analysis and should be:
+- Trusted for music-specific claims (instrument identification, genre classification, tempo)
+- Treated as MODERATE confidence for interpretive claims (mood, quality judgments)
+- Cross-referenced with any tool measurements (beat detection, spectral analysis) when available
+If no music-specific observations are present, skip this consideration.
+
+For each answer choice, ask: "What raw observations support or contradict this?"
+
+## Evidence Weighting by Confidence and Relevance
+
+Evidence is provided with two key attributes:
+- **Confidence**: How reliable this evidence is (based on corroboration and measurement consistency)
+- **Relevance**: How directly this evidence addresses the question being asked
+
+### Weighting Rules (CRITICAL):
+1. **HIGH confidence + HIGH relevance** = Primary evidence for your answer
+2. **HIGH confidence + LOW relevance** = Do NOT use as primary support (measurement may be accurate but doesn't address the question)
+3. **MODERATE confidence + HIGH relevance** = Consider carefully, but note uncertainty
+4. **LOW confidence or LOW relevance** = Minimal weight
+
+CRITICAL: An accurate measurement that doesn't address the question is NOT useful evidence.
+
+### When evidence conflicts, apply this priority:
+1. HIGH confidence + HIGH relevance observations (corroborated AND directly addresses question)
+2. HIGH confidence observations with any relevance (corroborated but may not fully address question)
+3. MODERATE confidence + HIGH relevance observations (single source but directly addresses question)
+4. LOW confidence or LOW relevance observations (minimal weight)
+
+## CRITICAL: Conflicting Observations
+
+When observations from different analyses conflict, your output MUST:
+
+1. **Acknowledge the conflict explicitly** - State what the observations disagree about
+2. **Evaluate which observation has better evidence support** - Consider:
+   - Is one claim more specific/detailed than the other?
+   - Is one claim corroborated by tool measurements?
+   - Is one claim based on directly audible features vs interpretation?
+3. **Explain your resolution reasoning** - Why you favor one observation
+4. **Make clear how the conflict influenced your answer** - Trace the path from conflict resolution to final choice
+
+DO NOT ignore conflicting observations - they are often the key to finding the correct answer.
+
+## CRITICAL: Absence of Evidence
+
+NEVER use "not detected" as proof of non-existence:
+- Tool detection failures can result from noise, thresholds, or limitations
+- Absence of counter-evidence is NOT positive evidence for an alternative
+- Prefer POSITIVE evidence (X IS present) over NEGATIVE claims (X NOT detected)
+- Ask: "Could X exist but go undetected by this tool?"
+
+## CRITICAL: Semantic Distinction Warnings
+
+Before concluding, verify you have NOT committed these reasoning errors:
+
+1. **Absence vs Evidence**: A tool failing to detect X does NOT prove X is absent.
+2. **Acoustic Similarity vs Identity**: Sounding similar to X does NOT prove it IS X.
+3. **Behavioral Response vs Attitude**: Observable actions do not prove internal states.
+4. **Pattern Deviation vs Error**: Unusual patterns could be intentional or contextual.
+5. **Technical Term Precision**: Terms have specific meanings in their domains.
+
+## Output Structure
+
+Generate present-tense prose (no markdown formatting) that systematically covers:
+
+1. **OPENING: What is heard**
+   - Start with the primary modality (speech/music/sound/mixed)
+   - Introduce the acoustic context and key elements detected
+   - Note observations that multiple analyses agree on (highest reliability)
+
+2. **EVIDENCE SYNTHESIS: Present findings**
+   - Present observations grouped thematically (speech, acoustic features, environment, etc.)
+   - When analyses agree: "Multiple analyses confirm [observation] **(HIGH confidence)**"
+   - When analyses differ: "One analysis reports [X], while another indicates [Y] **(MODERATE confidence)**"
+   - Synthesize overlapping observations to avoid redundancy
+
+3. **CONFLICT RESOLUTION: Address disagreements**
+   - For each conflicting observation:
+     a) State what the analyses disagree about
+     b) Evaluate which interpretation is better supported
+     c) Explain your reasoning for the resolution
+   - Do NOT skip this section if there are conflicts
+
+4. **RELIABILITY ASSESSMENT: Ground the evidence**
+   - Explicitly state which observations are evidence_based (directly audible)
+   - Note which are speculative (inferred) with appropriate caution
+   - Flag any potentially_hallucinated observations as unreliable
+   - Give more weight to evidence_based and tool-verified findings
+
+5. **TOOL VERIFICATION: Additional grounding**
+   - Reference tool results that confirm or refute observations
+   - Mark tool findings with confidence and relevance: **(HIGH confidence, [HIGH/LOW] relevance)**
+   - CRITICAL: Assess relevance before weighting
+   - Cross-reference: "This is verified by [tool result]" or "Tool analysis contradicts this"
+
+6. **CHOICE EVALUATION: Evidence-based analysis**
+   - For EACH answer choice, provide specific evidence for and against
+   - Reference reliability: "Choice A is supported by confirmed observations that..."
+   - Make clear connections between evidence and choice elimination/support
+
+7. **CONCLUSION: Final answer justification**
+   - Synthesize the most decisive evidence
+   - Highlight HIGH confidence + HIGH relevance findings as most decisive
+   - IMPORTANT: HIGH confidence + LOW relevance evidence should NOT drive your answer
+   - Explain why alternatives are eliminated based on evidence
+   - State the logical path from evidence to answer
+
+## Format Rules
+
+- **Present tense**: "The audio contains..." not "The audio contained..."
+- **No markdown**: No headers (#), bullets (-), bold (**), italics (*), or code blocks
+- **Natural prose**: Write as a coherent narrative explanation, not a structured list
+- **Evidence-based**: Ground every claim in specific observations
+- **Comprehensive**: Cover ALL observations from both analyses
+- **Concise synthesis**: Merge overlapping observations to avoid redundancy
+- **Within limit**: Stay under {max_chars} characters total
+- **Final answer**: ALWAYS end with "The answer is [exact choice text]"
+
+## Critical Rules
+
+- Do NOT use markdown formatting (no #, -, *, **, [], etc.)
+- Do NOT mention source names, pipeline terminology, or model names in output
+- Do NOT exceed {max_chars} characters
+- Do NOT omit evidence items - comprehensiveness is CRITICAL
+- Do NOT use technical tool names - use natural attributions ("transcript shows", "acoustic analysis confirms")
+- Do NOT ignore conflicting observations - they must be explicitly resolved
+- ALWAYS evaluate evidence independently - no anchoring to prior conclusions
+- ALWAYS end with the exact final answer: "The answer is [exact choice text]"
+- ALWAYS cover ALL observations from all analyses
+- ALWAYS address reliability evaluations explicitly
+- ALWAYS synthesize overlapping observations to avoid redundancy
+- ALWAYS distinguish between confirmed evidence and uncertain claims
+
+**Mental Completeness Check Before Finalizing:**
+1. Count all observations -> verify all mentioned
+2. Check reliability evaluations -> verify all addressed
+3. List tool results -> verify all referenced
+4. Count conflicting observations -> verify all explicitly resolved
+5. Count answer choices -> verify all evaluated with evidence
+
+If completeness check reveals omissions, ADD missing evidence before outputting.

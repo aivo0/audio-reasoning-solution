@@ -1,0 +1,158 @@
+You are analyzing audio evidence from two independent speech-to-reasoning models.
+Your task is to extract, compare, and evaluate their observations in a single unified analysis.
+
+## Source 1: StepAudioR1
+Predicted Answer: {stepaudior1_answer}
+
+Reasoning:
+{stepaudior1_reasoning}
+
+## Source 2: Qwen3
+Predicted Answer: {qwen3_answer}
+
+Reasoning:
+{qwen3_reasoning}
+
+## Question
+{question}
+
+## Choices
+{choices}
+
+## Your Analysis Tasks
+
+1. **Extract Key Evidence**: List the main observations each source made about the audio.
+   Focus on AUDIBLE evidence - things that can be verified by listening.
+
+2. **Identify Corroborated Evidence**: What do BOTH sources agree on?
+   - These claims are MORE reliable because multiple independent models heard the same thing
+   - Corroborated evidence should get higher confidence (0.8-0.95)
+   - Mark reliability as "evidence_based" if directly audible, "speculative" if interpreted
+
+3. **Identify Source-Specific Evidence**: What did only ONE source mention?
+   - These claims are less reliable without corroboration
+   - Confidence should be moderate (0.5-0.7)
+   - Be skeptical of very specific claims not mentioned by the other source
+
+4. **Identify Disagreements**: Where do sources conflict?
+   - Analyze which source is more credible for each disagreement
+   - Consider: specificity (more detail = more credible), consistency, plausibility
+
+5. **Assess Reliability**: For each piece of evidence:
+   - "evidence_based": Directly perceivable from audio (sounds, speech, timing)
+   - "speculative": Requires interpretation (emotion, intent, context)
+   - "potentially_hallucinated": Cannot be determined from audio alone
+
+6. **Recommend Answer**: Based on the evidence analysis, which choice is best supported?
+   - Prefer corroborated evidence over single-source claims
+   - When sources disagree, explain which source's reasoning is stronger
+   - Confidence should reflect the strength of evidence
+
+7. **Audio Content Types**: Classify what types of audio content are present:
+   - "speech": Human dialogue, conversation, narration
+   - "music": Instrumental or vocal music
+   - "sound_effects": Artificial sounds, notifications, impacts
+   - "environmental": Natural ambient sounds, animals, weather
+   - "silence": Extended quiet periods
+
+## Output Format (JSON)
+
+Return ONLY valid JSON (no markdown, no extra text):
+
+{{
+  "corroborated_evidence": [
+    {{
+      "content": "Evidence that both sources agree on",
+      "confidence": 0.85,
+      "reliability": "evidence_based"
+    }}
+  ],
+  "stepaudior1_specific": [
+    {{
+      "content": "Evidence only StepAudioR1 mentioned",
+      "confidence": 0.6,
+      "reliability": "speculative"
+    }}
+  ],
+  "qwen3_specific": [
+    {{
+      "content": "Evidence only Qwen3 mentioned",
+      "confidence": 0.6,
+      "reliability": "speculative"
+    }}
+  ],
+  "disagreements": [
+    {{
+      "topic": "what the disagreement is about",
+      "stepaudior1_claim": "what StepAudioR1 claims",
+      "qwen3_claim": "what Qwen3 claims",
+      "more_credible": "stepaudior1 | qwen3 | neither",
+      "reason": "why one source is more credible for this specific claim"
+    }}
+  ],
+  "overall_agreement": "unanimous | partial | conflicting",
+  "recommended_answer": "the best supported answer choice",
+  "confidence": 0.75,
+  "needs_tool_verification": false,
+  "verification_reasons": ["optional reasons why tool verification might help"],
+  "audio_content_types": ["speech", "environmental"]
+}}
+
+## Critical Rules
+
+1. **Corroborated evidence is KING**: If both sources agree on something, it's much more likely to be true.
+   Give corroborated evidence confidence 0.8-0.95.
+
+2. **Single-source claims need scrutiny**: Evidence from only one source could be hallucination.
+   Give single-source evidence confidence 0.5-0.7 unless it's very specific and plausible.
+
+3. **overall_agreement definitions**:
+   - "unanimous": Both sources predict the SAME answer AND agree on key evidence
+   - "partial": Sources have some agreement but also some unique observations
+   - "conflicting": Sources predict DIFFERENT answers OR have major disagreements
+
+4. **recommended_answer MUST be one of the exact choices provided**.
+
+5. **confidence** should reflect:
+   - How much corroborated evidence supports the answer (0.8+ if strong corroboration)
+   - How significant the disagreements are (lower if major conflicts)
+   - Whether the recommended answer is supported by both sources (higher if yes)
+
+6. **needs_tool_verification** should be true when:
+   - Sources disagree on countable things (speaker count, number of events)
+   - Evidence is speculative and could be verified by reproducible tools
+   - Key claims are uncorroborated but important for the answer
+
+7. **Audio content classification** helps determine which analysis tools are appropriate.
+   Always include at least one type.
+
+8. **Disregard Visual Claims**: Speech LLMs can only HEAR audio - they cannot see.
+   - IGNORE any claims referencing: "I see", "video shows", "visually", "in the frame", "on screen"
+   - These are hallucinations - speech LLMs have no visual input
+   - If a source says "the man is holding X" without mentioning hearing, treat as unreliable
+   - Re-interpret: If a source says "I see X happening", consider if they might have HEARD it
+
+9. **Never Dismiss Single-Source Evidence Outright**: When only one source reports an observation:
+   - Do NOT mark it as potentially_hallucinated solely because it lacks corroboration
+   - Mark it as "speculative" with moderate confidence (0.5-0.7)
+   - Set needs_tool_verification to true
+   - Add a verification_reason specifying the segment to analyze
+   - The observation should be confirmed or refuted by targeted segment analysis, not dismissed
+
+10. **Agreement + Reasoning Disagreement = Skepticism**:
+   When sources predict the SAME answer but have CONFLICTING or DIFFERENT observations/reasoning:
+   - This is a RED FLAG - they may be agreeing by coincidence with flawed logic
+   - Set overall_agreement to "partial" (NOT "unanimous")
+   - Lower confidence to 0.6-0.7 (NOT 0.8+)
+   - Set needs_tool_verification to true
+   - Add to verification_reasons: "Sources agree on answer but disagree on supporting evidence - independent verification needed"
+
+   Example: If both sources predict the same answer but one describes "sound A occurring"
+   while the other describes "sound B occurring", these are fundamentally different
+   observations that shouldn't reinforce each other.
+
+   Key indicators of reasoning disagreement:
+   - Sources describe DIFFERENT acoustic events/sounds
+   - Sources provide DIFFERENT causal explanations
+   - Sources focus on DIFFERENT aspects of the audio
+   - Observations from one source could equally support a DIFFERENT answer
