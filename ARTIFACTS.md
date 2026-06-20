@@ -21,8 +21,10 @@ materials referenced by the paper:
   JSON.
 - `samples/`: generated reasoning outputs for the 1,000 public MMAR benchmark
   samples. Each file records the sample ID, final answer, and reasoning chain.
-- `README.md`: index table linking every sample to its reasoning output,
+- `samples/INDEX.md`: full index linking every sample to its reasoning output,
   question, choices, and answer.
+- `README.md`: repository landing page with representative examples that
+  illustrate the paper's main evidence-fusion and verification behavior.
 
 ## Not Included
 
